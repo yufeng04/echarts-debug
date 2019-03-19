@@ -1402,7 +1402,9 @@
         trigger: function(type) {
             var _h = this._$handlers[type];
             var eventProcessor = this._$eventProcessor;
-
+            if (type === 'mouseover') {
+                console.log(type);
+            }
             if (_h) {
                 var args = arguments;
                 var argLen = args.length;
@@ -5501,6 +5503,10 @@
                 if (child.type === 'group') {
                     child.traverse(cb, context);
                 }
+
+                // if (this._children[0].hoverStyle && !this._children[0].hoverStyle.lineDash) {
+                //     this._children[0].hoverStyle.lineDash = [0, 0];
+                // }
             }
             return this;
         },
@@ -11799,7 +11805,7 @@
             var lineType = this.get('type');
             var dotSize = Math.max(lineWidth, 2);
             var dashSize = lineWidth * 4;
-            return (lineType === 'solid' || lineType == null) ? null : (lineType === 'dashed' ? [dashSize, dashSize] : [dotSize, dotSize]);
+            return (lineType === 'solid' || lineType == null) ? [0, 0] : (lineType === 'dashed' ? [dashSize, dashSize] : [dotSize, dotSize]);
         }
     };
 
@@ -16353,6 +16359,7 @@
  * @param {Object} [emphasisSpecified]
  */
     function setLabelStyle(normalStyle, emphasisStyle, normalModel, emphasisModel, opt, normalSpecified, emphasisSpecified) {
+        console.log(normalStyle, emphasisStyle, normalModel, emphasisModel, opt, normalSpecified, emphasisSpecified);
         opt = opt || EMPTY_OBJ;
         var labelFetcher = opt.labelFetcher;
         var labelDataIndex = opt.labelDataIndex;
@@ -27144,9 +27151,6 @@
         }, this);
 
         each(eventActionMap, function(actionType, eventType) {
-            if(actionType === 'click') {
-                console.log('click');
-            }
             this._messageCenter.on(eventType, function(event) {
                 this.trigger(eventType, event);
             }, this);
@@ -52064,6 +52068,7 @@
 
             lineStyle = itemModel.getModel('lineStyle').getLineStyle();
             hoverLineStyle = itemModel.getModel('emphasis.lineStyle').getLineStyle();
+            // hoverLineStyle.lineType = 'solid';
 
             labelModel = itemModel.getModel('label');
             hoverLabelModel = itemModel.getModel('emphasis.label');
@@ -66531,6 +66536,9 @@
                 var textLayout = data.getItemLayout(indices[0]);
                 var itemModel = data.getItemModel(indices[j - 1]);
                 var labelModel = itemModel.getModel('label');
+                if (labelModel.option) {
+                    console.log(labelModel.option, 'labelModel');
+                }
                 var margin = labelModel.get('margin');
                 if (status === 'add') {
                     var layerGroup = newLayersGroups[idx] = new Group();
@@ -66579,9 +66587,11 @@
                         }
                     }, seriesModel);
                 }
-
-                var hoverItemStyleModel = itemModel.getModel('emphasis.itemStyle');
+                
+                
                 var itemStyleModel = itemModel.getModel('itemStyle');
+                var hoverItemStyleModel = itemModel.getModel('emphasis.itemStyle');
+
 
                 setTextStyle(text.style, labelModel, {
                     text: labelModel.get('show') ? seriesModel.getFormattedLabel(indices[j - 1], 'normal') || data.getName(indices[j - 1]) : null,
